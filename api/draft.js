@@ -6,25 +6,37 @@ function fallback(item){
 }
 
 function extractText(data){
-  if(data?.output_text) return data.output_text;
-  const out=data?.output||[];
+  if(typeof data?.output_text==='string') return data.output_text;
   const parts=[];
-  for(const item of out){
-    for(const c of item?.content||[]){if(c?.type==='output_text'&&c?.text)parts.push(c.text)}
+  for(const item of data?.output||[]){
+    for(const c of item?.content||[]){if(typeof c?.text==='string')parts.push(c.text)}
   }
   return parts.join('\n').trim();
 }
 
+function authorized(req){
+  const expected=process.env.CLIPPING_HQ_ACCESS_KEY;
+  if(!expected) return true;
+  return req.headers['x-hq-key']===expected;
+}
+
 export default async function handler(req,res){
   if(req.method!=='POST') return res.status(405).json({error:'POST only'});
+  if(!authorized(req)) return res.status(401).json({error:'Unauthorized'});
   const item=req.body||{};
   if(!process.env.OPENAI_API_KEY){return res.status(200).json({mode:'template',text:fallback(item)})}
   try{
     const prompt=`You are the AI production assistant inside Clipping HQ. Turn this current story lead into an ORIGINAL, transformative vertical-video post pack. Do not encourage simple reposting. Keep source footage minimal and tell the creator to add original narration, context, criticism, analysis, or reaction. Avoid claiming fair use is guaranteed.\n\nStory title: ${safe(item.title)}\nCategory: ${safe(item.category)}\nWhy it may work: ${safe(item.why)}\nSuggested hook: ${safe(item.hook)}\nSource URL: ${safe(item.url)}\nRisk: ${safe(item.risk)}\n\nReturn these exact sections in plain text: HOOK, NARRATION ANGLE, SHORT SCRIPT, EDIT PLAN, TITLE, CAPTION, RISK NOTE. Keep the entire answer under 500 words.`;
-    const r=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'Authorization':`Bearer ${process.env.OPENAI_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({model:'gpt-5.6-luna',input:prompt,store:false})});
-    if(!r.ok){const detail=await r.text();throw new Error(detail.slice(0,500))}
+    const r=await fetch('https://api.openai.com/v1/responses',{
+      method:'POST',
+      headers:{'Authorization':`Bearer ${process.env.OPENAI_API_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({model:process.env.OPENAI_MODEL||'gpt-5-mini',input:prompt})
+    });
     const data=await r.json();
+    if(!r.ok) throw new Error(data?.error?.message||`OpenAI error ${r.status}`);
     const text=extractText(data)||fallback(item);
     res.status(200).json({mode:'openai',text});
-  }catch(e){res.status(200).json({mode:'template',warning:'AI API unavailable; used template mode.',text:fallback(item)})}
+  }catch(e){
+    res.status(200).json({mode:'template',warning:'AI API unavailable; used template mode.',text:fallback(item)})
+  }
 }
