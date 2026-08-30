@@ -32,6 +32,33 @@ function closePack(){$('#packModal').classList.remove('open');$('#packModal').se
 $('#closePack').onclick=closePack;$('#closePack2').onclick=closePack;$('#copyPack').onclick=async()=>{if(!currentPack)return;try{await navigator.clipboard.writeText(currentPack);toast('Post pack copied ✓')}catch{toast('Select the text and copy it manually')}};
 $('#packModal').onclick=e=>{if(e.target.id==='packModal')closePack()};
 $('#refreshScout').onclick=loadScout;$('#refreshScout2').onclick=loadScout;
-$$('.connect').forEach(b=>b.onclick=()=>{switchView('settings');toast(`${b.dataset.platform}: one-time developer authorization is required`)});
+
+async function connectYouTube(){
+  try{
+    const r=await apiFetch('/api/youtube/connect');
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(d.error||'YouTube setup is not finished yet.');
+    location.href=d.url;
+  }catch(e){toast(e.message||'YouTube connection is not ready yet')}
+}
+async function loadYouTubeStatus(){
+  try{
+    const r=await apiFetch('/api/youtube/status');
+    const d=await r.json().catch(()=>({}));
+    const buttons=$$('.connect[data-platform="YouTube"]');
+    const cards=$$('.platform.yt .status');
+    if(d.connected){
+      buttons.forEach(b=>{b.textContent=`✓ ${d.channelTitle||'YouTube connected'}`;b.classList.add('connected')});
+      cards.forEach(s=>{s.textContent='Connected';s.classList.remove('setup');s.classList.add('good')});
+    } else if(d.configured===false){
+      buttons.forEach(b=>b.textContent='Finish YouTube setup');
+    }
+  }catch{}
+}
+$$('.connect').forEach(b=>b.onclick=()=>{
+  if(b.dataset.platform==='YouTube') return connectYouTube();
+  switchView('settings');toast(`${b.dataset.platform}: one-time developer authorization is required`);
+});
 async function loadStatus(){try{const r=await fetch('/api/status');const s=await r.json();const a=$('#aiMode');if(s.aiConfigured&&s.accessKeyRequired&&!hqKey()){a.textContent='AI: access key needed';a.classList.remove('good')}else{a.textContent=s.aiConfigured?`AI: ${s.aiProvider||s.model||'connected'} connected`:'AI: template mode';a.classList.toggle('good',s.aiConfigured)}}catch{$('#aiMode').textContent='AI: template mode'}}
-loadStatus();loadScout();
+if(new URLSearchParams(location.search).get('youtube')==='connected'){history.replaceState({},'',location.pathname);toast('YouTube connected ✓')}
+loadStatus();loadYouTubeStatus();loadScout();
