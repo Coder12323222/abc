@@ -1,0 +1,1 @@
+Trigger production deployment for Clipping HQ after switching Vercel Production branch to clipping-hq-site.
