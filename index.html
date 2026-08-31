@@ -39,7 +39,7 @@
 
         <div class="grid platforms">
           <article class="platform yt"><div class="platform-top"><span class="platform-icon">▶</span><div><h3>YouTube</h3><p>Shorts + upload</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="YouTube">Connect YouTube</button></article>
-          <article class="platform tt"><div class="platform-top"><span class="platform-icon">♪</span><div><h3>TikTok</h3><p>Connected • posting approval next</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="TikTok">Connect TikTok</button></article>
+          <article class="platform tt"><div class="platform-top"><span class="platform-icon">♪</span><div><h3>TikTok</h3><p>Connected • draft uploader</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="TikTok">Connect TikTok</button></article>
           <article class="platform ig"><div class="platform-top"><span class="platform-icon">◎</span><div><h3>Instagram</h3><p>Optional later</p></div><span class="status setup">Later</span></div><button class="connect" data-platform="Instagram">Instagram later</button></article>
         </div>
 
@@ -54,7 +54,7 @@
       </section>
 
       <section id="queue" class="view">
-        <div class="section-head"><div><p class="eyebrow">APPROVAL QUEUE</p><h2>Ready when you are</h2><p class="sub">Generate the AI pack, finish your vertical video, then upload it to YouTube here.</p></div></div>
+        <div class="section-head"><div><p class="eyebrow">APPROVAL QUEUE</p><h2>Ready when you are</h2><p class="sub">Generate the AI pack, finish your vertical video, then upload it to YouTube or TikTok here.</p></div></div>
         <div id="queueList" class="queue-empty"><div class="big-icon">▣</div><h3>No posts queued yet</h3><p>Save one of today's scout opportunities.</p><button class="primary" data-go="scout">Open Daily Scout</button></div>
       </section>
 
@@ -62,7 +62,7 @@
         <div class="section-head"><div><p class="eyebrow">SOCIAL ACCOUNTS</p><h2>Connect once</h2><p class="sub">Official OAuth connections live here. Never paste your social passwords into this site.</p></div></div>
         <div class="setup-list">
           <div><b>1</b><span><strong>YouTube OAuth</strong><small>Connected for channel access and uploads.</small></span><button class="connect" data-platform="YouTube">Connect</button></div>
-          <div><b>2</b><span><strong>TikTok Login Kit</strong><small>Connected. Direct posting needs Content Posting API approval.</small></span><button class="connect" data-platform="TikTok">Connect</button></div>
+          <div><b>2</b><span><strong>TikTok Login Kit</strong><small>Connected. Draft uploads use TikTok Content Posting API.</small></span><button class="connect" data-platform="TikTok">Connect</button></div>
           <div><b>3</b><span><strong>Instagram</strong><small>Optional later; YouTube and TikTok are the current focus.</small></span><button class="connect" data-platform="Instagram">Later</button></div>
         </div>
       </section>
@@ -73,10 +73,10 @@
           <label><input type="checkbox" checked disabled /> YouTube connected</label>
           <label><input type="checkbox" checked disabled /> TikTok connected</label>
           <label><input type="checkbox" checked disabled /> Gemini AI drafting configured</label>
-          <label><input type="checkbox" /> TikTok Content Posting API approval</label>
+          <label><input type="checkbox" /> TikTok Content Posting API + video.upload</label>
           <label><input type="checkbox" /> Google public-upload API audit/approval</label>
         </div>
-        <div class="notice"><b>Important:</b> YouTube test uploads are kept Private until Google allows public API uploads for the project. TikTok posting stays disabled until TikTok grants the required posting scopes.</div>
+        <div class="notice"><b>Important:</b> YouTube test uploads are kept Private until Google allows public API uploads for the project. TikTok draft uploads require the Content Posting API and video.upload scope, then you finish the post inside TikTok.</div>
       </section>
 
       <footer style="padding:28px 0 12px;text-align:center;color:#9aa3b8;font-size:13px">
@@ -92,5 +92,6 @@
 
   <div id="toast" class="toast"></div>
   <script src="/app.js"></script>
+  <script src="/tiktok-upload.js"></script>
 </body>
 </html>
