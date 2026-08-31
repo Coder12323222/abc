@@ -38,9 +38,9 @@
         </div>
 
         <div class="grid platforms">
-          <article class="platform yt"><div class="platform-top"><span class="platform-icon">▶</span><div><h3>YouTube</h3><p>Shorts</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="YouTube">Connect YouTube</button></article>
-          <article class="platform tt"><div class="platform-top"><span class="platform-icon">♪</span><div><h3>TikTok</h3><p>Short-form</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="TikTok">Connect TikTok</button></article>
-          <article class="platform ig"><div class="platform-top"><span class="platform-icon">◎</span><div><h3>Instagram</h3><p>Reels</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="Instagram">Connect Instagram</button></article>
+          <article class="platform yt"><div class="platform-top"><span class="platform-icon">▶</span><div><h3>YouTube</h3><p>Shorts + upload</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="YouTube">Connect YouTube</button></article>
+          <article class="platform tt"><div class="platform-top"><span class="platform-icon">♪</span><div><h3>TikTok</h3><p>Connected • posting approval next</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="TikTok">Connect TikTok</button></article>
+          <article class="platform ig"><div class="platform-top"><span class="platform-icon">◎</span><div><h3>Instagram</h3><p>Optional later</p></div><span class="status setup">Later</span></div><button class="connect" data-platform="Instagram">Instagram later</button></article>
         </div>
 
         <div class="section-head"><div><p class="eyebrow">TODAY'S PICKS</p><h2>Best clip opportunities</h2></div><button class="ghost" data-go="scout">See all →</button></div>
@@ -54,29 +54,29 @@
       </section>
 
       <section id="queue" class="view">
-        <div class="section-head"><div><p class="eyebrow">APPROVAL QUEUE</p><h2>Ready when you are</h2><p class="sub">Save a scout item and it lands here. One approval is the goal.</p></div></div>
+        <div class="section-head"><div><p class="eyebrow">APPROVAL QUEUE</p><h2>Ready when you are</h2><p class="sub">Generate the AI pack, finish your vertical video, then upload it to YouTube here.</p></div></div>
         <div id="queueList" class="queue-empty"><div class="big-icon">▣</div><h3>No posts queued yet</h3><p>Save one of today's scout opportunities.</p><button class="primary" data-go="scout">Open Daily Scout</button></div>
       </section>
 
       <section id="accounts" class="view">
-        <div class="section-head"><div><p class="eyebrow">SOCIAL ACCOUNTS</p><h2>Connect once</h2><p class="sub">Official OAuth connections will live here. Never paste your social passwords into this site.</p></div></div>
+        <div class="section-head"><div><p class="eyebrow">SOCIAL ACCOUNTS</p><h2>Connect once</h2><p class="sub">Official OAuth connections live here. Never paste your social passwords into this site.</p></div></div>
         <div class="setup-list">
-          <div><b>1</b><span><strong>YouTube OAuth</strong><small>Upload Shorts and read channel stats after Google API setup.</small></span><button class="connect" data-platform="YouTube">Connect</button></div>
-          <div><b>2</b><span><strong>TikTok Content Posting API</strong><small>Direct posting requires TikTok developer approval/audit.</small></span><button class="connect" data-platform="TikTok">Connect</button></div>
-          <div><b>3</b><span><strong>Instagram Professional Account</strong><small>Reels publishing uses Meta/Instagram permissions.</small></span><button class="connect" data-platform="Instagram">Connect</button></div>
+          <div><b>1</b><span><strong>YouTube OAuth</strong><small>Connected for channel access and uploads.</small></span><button class="connect" data-platform="YouTube">Connect</button></div>
+          <div><b>2</b><span><strong>TikTok Login Kit</strong><small>Connected. Direct posting needs Content Posting API approval.</small></span><button class="connect" data-platform="TikTok">Connect</button></div>
+          <div><b>3</b><span><strong>Instagram</strong><small>Optional later; YouTube and TikTok are the current focus.</small></span><button class="connect" data-platform="Instagram">Later</button></div>
         </div>
       </section>
 
       <section id="settings" class="view">
-        <div class="section-head"><div><p class="eyebrow">ONE-TIME SETUP</p><h2>What still needs your accounts</h2></div></div>
+        <div class="section-head"><div><p class="eyebrow">ONE-TIME SETUP</p><h2>Current build status</h2></div></div>
         <div class="checklist">
-          <label><input type="checkbox" /> Create your YouTube channel</label>
-          <label><input type="checkbox" /> Create your TikTok account</label>
-          <label><input type="checkbox" /> Create/convert Instagram to Creator or Business</label>
-          <label><input type="checkbox" /> Register developer apps for official posting APIs</label>
-          <label><input type="checkbox" /> Gemini AI drafting configured</label>
+          <label><input type="checkbox" checked disabled /> YouTube connected</label>
+          <label><input type="checkbox" checked disabled /> TikTok connected</label>
+          <label><input type="checkbox" checked disabled /> Gemini AI drafting configured</label>
+          <label><input type="checkbox" /> TikTok Content Posting API approval</label>
+          <label><input type="checkbox" /> Google public-upload API audit/approval</label>
         </div>
-        <div class="notice"><b>Important:</b> This dashboard can automate discovery and prepare content now. Full public auto-posting only turns on after each platform's official API approval/permissions are configured.</div>
+        <div class="notice"><b>Important:</b> YouTube test uploads are kept Private until Google allows public API uploads for the project. TikTok posting stays disabled until TikTok grants the required posting scopes.</div>
       </section>
 
       <footer style="padding:28px 0 12px;text-align:center;color:#9aa3b8;font-size:13px">
@@ -85,7 +85,12 @@
       </footer>
     </main>
   </div>
-  <div id="packModal" class="modal" aria-hidden="true"><div class="modal-card"><div class="modal-head"><div><p class="eyebrow">AI POST PACK</p><h2 id="packTitle">Draft</h2></div><button id="closePack" class="icon-btn">×</button></div><div id="packBody" class="pack-body">Generating…</div><div class="modal-actions"><button id="copyPack" class="ghost">Copy pack</button><button id="closePack2" class="primary">Done</button></div></div></div><div id="toast" class="toast"></div>
+
+  <div id="packModal" class="modal" aria-hidden="true"><div class="modal-card"><div class="modal-head"><div><p class="eyebrow">AI POST PACK</p><h2 id="packTitle">Draft</h2></div><button id="closePack" class="icon-btn">×</button></div><div id="packBody" class="pack-body">Generating…</div><div class="modal-actions"><button id="copyPack" class="ghost">Copy pack</button><button id="closePack2" class="primary">Done</button></div></div></div>
+
+  <div id="publishModal" class="modal" aria-hidden="true"><div class="modal-card publish-card"><div class="modal-head"><div><p class="eyebrow">YOUTUBE PUBLISH</p><h2>Upload finished Short</h2><p class="sub">Choose the edited video you own or have permission to publish.</p></div><button id="closePublish" class="icon-btn">×</button></div><div class="publish-form"><label>Video file<input id="publishVideo" type="file" accept="video/mp4,video/quicktime,video/webm,video/*"></label><label>Title<input id="publishTitle" type="text" maxlength="100"></label><label>Description<textarea id="publishDescription" maxlength="5000" rows="7"></textarea></label><div class="notice"><b>Testing mode:</b> Clipping HQ uploads this video as <b>Private</b>. Public API uploads can be enabled after Google approves the API project.</div><div id="publishProgress" class="publish-progress">Ready to upload.</div></div><div class="modal-actions"><button id="cancelPublish" class="ghost">Cancel</button><button id="startPublish" class="primary">▶ Upload to YouTube</button></div></div></div>
+
+  <div id="toast" class="toast"></div>
   <script src="/app.js"></script>
 </body>
 </html>
