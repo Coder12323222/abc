@@ -24,6 +24,7 @@ export default async function handler(req,res){
       access_token:td.access_token,
       refresh_token:td.refresh_token||null,
       expires_at:Date.now()+(td.expires_in||3600)*1000,
+      scope:td.scope||'',
       channel_id:channel.id,
       channel_title:channel.snippet?.title||'YouTube'
     });
