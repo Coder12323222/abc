@@ -1,12 +1,19 @@
 import {authorized,refreshIfNeeded} from './_lib.js';
 
 function safe(x='',max=5000){return String(x).slice(0,max)}
+function hasUploadScope(scope=''){
+  const scopes=String(scope).split(/\s+/).filter(Boolean);
+  return scopes.includes('https://www.googleapis.com/auth/youtube.upload')||
+    scopes.includes('https://www.googleapis.com/auth/youtube')||
+    scopes.includes('https://www.googleapis.com/auth/youtube.force-ssl');
+}
 
 export default async function handler(req,res){
   if(req.method!=='POST')return res.status(405).json({error:'POST only'});
   if(!authorized(req))return res.status(401).json({error:'Invalid Clipping HQ access key'});
   const token=await refreshIfNeeded(req,res);
   if(!token?.access_token)return res.status(401).json({error:'Reconnect YouTube before uploading.'});
+  if(!hasUploadScope(token.scope||''))return res.status(403).json({error:'YouTube is connected for viewing, but the upload permission is missing. Reconnect YouTube in Clipping HQ and approve video upload access.'});
   const {title,description,contentType,contentLength}=req.body||{};
   if(!title)return res.status(400).json({error:'A video title is required.'});
   const length=Number(contentLength||0);
