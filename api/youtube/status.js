@@ -7,6 +7,16 @@ function hasUploadScope(scope=''){
     scopes.includes('https://www.googleapis.com/auth/youtube.force-ssl');
 }
 
+async function resolveScope(token){
+  if(hasUploadScope(token?.scope||''))return token.scope||'';
+  try{
+    const r=await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(token.access_token)}`,{headers:{'Cache-Control':'no-cache'}});
+    const d=await r.json();
+    if(r.ok&&d?.scope)return String(d.scope);
+  }catch{}
+  return token?.scope||'';
+}
+
 export default async function handler(req,res){
   if(req.method!=='GET')return res.status(405).json({error:'GET only'});
   if(!authorized(req))return res.status(401).json({error:'Invalid Clipping HQ access key'});
@@ -20,7 +30,8 @@ export default async function handler(req,res){
     if(!r.ok)return res.status(200).json({configured:true,connected:false,uploadAuthorized:false});
     const channel=d?.items?.[0];
     if(!channel)return res.status(200).json({configured:true,connected:false,uploadAuthorized:false});
-    const uploadAuthorized=hasUploadScope(token.scope||'');
+    const resolvedScope=await resolveScope(token);
+    const uploadAuthorized=hasUploadScope(resolvedScope);
     return res.status(200).json({configured:true,connected:true,uploadAuthorized,channelId:channel.id,channelTitle:channel.snippet?.title||token.channel_title||'YouTube'});
   }catch{return res.status(200).json({configured:true,connected:false,uploadAuthorized:false})}
 }
