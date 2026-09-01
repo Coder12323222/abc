@@ -25,6 +25,7 @@ export default async function handler(req,res){
       refresh_token:td.refresh_token||null,
       expires_at:Date.now()+(td.expires_in||86400)*1000,
       refresh_expires_at:Date.now()+(td.refresh_expires_in||31536000)*1000,
+      scope:td.scope||'',
       open_id:td.open_id||user.open_id||null,
       display_name:user.display_name||'TikTok'
     });
