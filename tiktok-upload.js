@@ -68,3 +68,56 @@
 
   addTikTokButtons();
 })();
+
+// Force a real TikTok OAuth reset before reconnecting. This revokes the old
+// TikTok token, clears Clipping HQ's TikTok cookie, then starts a brand-new
+// authorization flow so TikTok can show the app + requested permissions again.
+(()=>{
+  const buttons=()=>[...document.querySelectorAll('.connect[data-platform="TikTok"]')];
+  const statuses=()=>[...document.querySelectorAll('.platform.tt .status')];
+
+  async function refreshTikTokConnectionUi(){
+    try{
+      const r=await apiFetch('/api/tiktok/status',{cache:'no-store'});
+      const d=await r.json().catch(()=>({}));
+      if(d.connected&&d.uploadAuthorized){
+        buttons().forEach(b=>{b.textContent=`✓ ${d.displayName||'TikTok'} • upload ready`;b.classList.add('connected')});
+        statuses().forEach(s=>{s.textContent='Upload ready';s.classList.remove('setup');s.classList.add('good')});
+      }else if(d.connected){
+        buttons().forEach(b=>{b.textContent='Reset + reconnect TikTok';b.classList.remove('connected')});
+        statuses().forEach(s=>{s.textContent='Needs upload access';s.classList.add('setup');s.classList.remove('good')});
+      }else if(d.configured===false){
+        buttons().forEach(b=>{b.textContent='Finish TikTok setup';b.classList.remove('connected')});
+        statuses().forEach(s=>{s.textContent='Setup';s.classList.add('setup');s.classList.remove('good')});
+      }else{
+        buttons().forEach(b=>{b.textContent='Connect TikTok';b.classList.remove('connected')});
+        statuses().forEach(s=>{s.textContent='Not connected';s.classList.add('setup');s.classList.remove('good')});
+      }
+    }catch{}
+  }
+
+  async function resetAndReconnectTikTok(){
+    const bs=buttons();
+    bs.forEach(b=>{b.disabled=true;b.textContent='Resetting TikTok…'});
+    try{
+      const reset=await apiFetch('/api/tiktok/disconnect',{method:'POST'});
+      const rd=await reset.json().catch(()=>({}));
+      if(!reset.ok)throw new Error(rd.error||`TikTok reset failed (${reset.status})`);
+      toast('Old TikTok authorization cleared. Opening fresh TikTok consent…');
+      const r=await apiFetch('/api/tiktok/connect',{cache:'no-store'});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok||!d.url)throw new Error(d.error||'TikTok authorization could not start.');
+      location.href=d.url;
+    }catch(e){
+      toast(e?.message||'TikTok reset failed');
+      bs.forEach(b=>b.disabled=false);
+      refreshTikTokConnectionUi();
+    }
+  }
+
+  function wire(){buttons().forEach(b=>{b.onclick=resetAndReconnectTikTok;b.disabled=false})}
+  wire();
+  setTimeout(()=>{wire();refreshTikTokConnectionUi()},600);
+  setTimeout(()=>{wire();refreshTikTokConnectionUi()},1800);
+  window.resetAndReconnectTikTok=resetAndReconnectTikTok;
+})();
