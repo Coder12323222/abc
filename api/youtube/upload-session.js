@@ -8,12 +8,23 @@ function hasUploadScope(scope=''){
     scopes.includes('https://www.googleapis.com/auth/youtube.force-ssl');
 }
 
+async function resolveScope(token){
+  if(hasUploadScope(token?.scope||''))return token.scope||'';
+  try{
+    const r=await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(token.access_token)}`,{headers:{'Cache-Control':'no-cache'}});
+    const d=await r.json();
+    if(r.ok&&d?.scope)return String(d.scope);
+  }catch{}
+  return token?.scope||'';
+}
+
 export default async function handler(req,res){
   if(req.method!=='POST')return res.status(405).json({error:'POST only'});
   if(!authorized(req))return res.status(401).json({error:'Invalid Clipping HQ access key'});
   const token=await refreshIfNeeded(req,res);
   if(!token?.access_token)return res.status(401).json({error:'Reconnect YouTube before uploading.'});
-  if(!hasUploadScope(token.scope||''))return res.status(403).json({error:'YouTube is connected for viewing, but the upload permission is missing. Reconnect YouTube in Clipping HQ and approve video upload access.'});
+  const resolvedScope=await resolveScope(token);
+  if(!hasUploadScope(resolvedScope))return res.status(403).json({error:'YouTube is connected, but Google did not grant video upload permission. Reconnect YouTube in Clipping HQ and approve Manage your YouTube videos.'});
   const {title,description,contentType,contentLength}=req.body||{};
   if(!title)return res.status(400).json({error:'A video title is required.'});
   const length=Number(contentLength||0);
@@ -38,5 +49,5 @@ export default async function handler(req,res){
     const uploadUrl=r.headers.get('location');
     if(!uploadUrl)throw new Error('YouTube did not return an upload session URL.');
     return res.status(200).json({uploadUrl,accessToken:token.access_token,privacyStatus:'private'});
-  }catch(e){return res.status(500).json({error:String(e?.message||e).slice(0,300)})}
+  }catch(e){return res.status(500).json({error:String(e?.message||e).slice(0,500)})}
 }
