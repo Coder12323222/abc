@@ -1,10 +1,15 @@
 import {authorized,refreshIfNeeded} from './_lib.js';
 
+function hasVideoUploadScope(scope=''){
+  return String(scope).split(/[\s,]+/).filter(Boolean).includes('video.upload');
+}
+
 export default async function handler(req,res){
   if(req.method!=='POST')return res.status(405).json({error:'POST only'});
   if(!authorized(req))return res.status(401).json({error:'Invalid Clipping HQ access key'});
   const token=await refreshIfNeeded(req,res);
   if(!token?.access_token)return res.status(401).json({error:'TikTok is not connected. Reconnect TikTok first.'});
+  if(!hasVideoUploadScope(token.scope||''))return res.status(403).json({error:'TikTok is connected for profile access, but video.upload permission is missing. Reconnect TikTok and approve video upload access. If TikTok does not offer that permission, enable Content Posting API + video.upload for the TikTok developer app first.'});
   const {contentType,contentLength}=req.body||{};
   const size=Number(contentLength||0);
   const allowed=['video/mp4','video/quicktime','video/webm'];
@@ -19,7 +24,10 @@ export default async function handler(req,res){
     });
     const d=await r.json();
     const err=d?.error;
-    if(!r.ok||(err?.code&&err.code!=='ok'))throw new Error(err?.message||`TikTok upload init failed (${r.status})`);
+    if(!r.ok||(err?.code&&err.code!=='ok')){
+      const code=err?.code?` [${err.code}]`:'';
+      throw new Error(`${err?.message||`TikTok upload init failed (${r.status})`}${code}`);
+    }
     const uploadUrl=d?.data?.upload_url;
     const publishId=d?.data?.publish_id;
     if(!uploadUrl)throw new Error('TikTok did not return an upload URL. Make sure Content Posting API and video.upload are enabled, then reconnect TikTok.');
