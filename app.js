@@ -94,9 +94,12 @@ async function loadYouTubeStatus(){
     const d=await r.json().catch(()=>({}));
     const buttons=$$('.connect[data-platform="YouTube"]');
     const cards=$$('.platform.yt .status');
-    if(d.connected){
-      buttons.forEach(b=>{b.textContent=`✓ ${d.channelTitle||'YouTube connected'}`;b.classList.add('connected')});
-      cards.forEach(s=>{s.textContent='Connected';s.classList.remove('setup');s.classList.add('good')});
+    if(d.connected&&d.uploadAuthorized){
+      buttons.forEach(b=>{b.textContent=`✓ ${d.channelTitle||'YouTube'} • upload ready`;b.classList.add('connected')});
+      cards.forEach(s=>{s.textContent='Upload ready';s.classList.remove('setup');s.classList.add('good')});
+    } else if(d.connected){
+      buttons.forEach(b=>{b.textContent='Reconnect YouTube for uploads';b.classList.remove('connected')});
+      cards.forEach(s=>{s.textContent='Needs upload access';s.classList.add('setup');s.classList.remove('good')});
     } else if(d.configured===false){
       buttons.forEach(b=>b.textContent='Finish YouTube setup');
     }
@@ -117,9 +120,12 @@ async function loadTikTokStatus(){
     const d=await r.json().catch(()=>({}));
     const buttons=$$('.connect[data-platform="TikTok"]');
     const cards=$$('.platform.tt .status');
-    if(d.connected){
-      buttons.forEach(b=>{b.textContent=`✓ ${d.displayName||'TikTok connected'}`;b.classList.add('connected')});
-      cards.forEach(s=>{s.textContent='Connected';s.classList.remove('setup');s.classList.add('good')});
+    if(d.connected&&d.uploadAuthorized){
+      buttons.forEach(b=>{b.textContent=`✓ ${d.displayName||'TikTok'} • upload ready`;b.classList.add('connected')});
+      cards.forEach(s=>{s.textContent='Upload ready';s.classList.remove('setup');s.classList.add('good')});
+    } else if(d.connected){
+      buttons.forEach(b=>{b.textContent='Reconnect TikTok for uploads';b.classList.remove('connected')});
+      cards.forEach(s=>{s.textContent='Needs video.upload';s.classList.add('setup');s.classList.remove('good')});
     } else if(d.configured===false){
       buttons.forEach(b=>b.textContent='Finish TikTok setup');
     }
