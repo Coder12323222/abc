@@ -1,4 +1,4 @@
-import {authorized,refreshIfNeeded} from './_lib.js';
+import {authorized,refreshIfNeeded} from '../../lib/youtube.js';
 
 function hasUploadScope(scope=''){
   const scopes=String(scope).split(/\s+/).filter(Boolean);

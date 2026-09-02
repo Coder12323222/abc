@@ -1,4 +1,4 @@
-import {authorized,refreshIfNeeded} from './_lib.js';
+import {authorized,refreshIfNeeded} from '../../lib/tiktok.js';
 
 function hasVideoUploadScope(scope=''){
   return String(scope).split(/[\s,]+/).filter(Boolean).includes('video.upload');

@@ -1,4 +1,4 @@
-import {authorized,refreshIfNeeded} from './_lib.js';
+import {authorized,refreshIfNeeded} from '../../lib/youtube.js';
 
 function safe(x='',max=5000){return String(x).slice(0,max)}
 function hasUploadScope(scope=''){

@@ -100,7 +100,7 @@
     const bs=buttons();
     bs.forEach(b=>{b.disabled=true;b.textContent='Resetting TikTok…'});
     try{
-      const reset=await apiFetch('/api/tiktok/disconnect',{method:'POST'});
+      const reset=await apiFetch('/api/tiktok/status',{method:'POST'});
       const rd=await reset.json().catch(()=>({}));
       if(!reset.ok)throw new Error(rd.error||`TikTok reset failed (${reset.status})`);
       toast('Old TikTok authorization cleared. Opening fresh TikTok consent…');

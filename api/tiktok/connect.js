@@ -1,4 +1,4 @@
-import {authorized,REDIRECT_URI,signState} from './_lib.js';
+import {authorized,REDIRECT_URI,signState} from '../../lib/tiktok.js';
 
 export default async function handler(req,res){
   if(req.method!=='GET')return res.status(405).json({error:'GET only'});

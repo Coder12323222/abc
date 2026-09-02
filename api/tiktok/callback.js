@@ -1,4 +1,4 @@
-import {BASE_URL,REDIRECT_URI,setTokenCookie,verifyState} from './_lib.js';
+import {BASE_URL,REDIRECT_URI,setTokenCookie,verifyState} from '../../lib/tiktok.js';
 
 export default async function handler(req,res){
   const {code,state,error,error_description}=req.query||{};
