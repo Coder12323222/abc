@@ -22,9 +22,14 @@ async function visualAssets(query){
     const r=await fetch(`https://api.pexels.com/videos/search?orientation=portrait&size=medium&per_page=6&query=${encodeURIComponent(query)}`,{headers:{Authorization:pexels}});
     if(r.ok){const d=await r.json();const found=(d.videos||[]).map(v=>{const files=(v.video_files||[]).filter(f=>f.link&&f.width&&f.height).sort((a,b)=>Math.abs((a.width||720)-720)-Math.abs((b.width||720)-720)),f=files.find(x=>x.height>x.width&&x.quality!=='uhd')||files[0];return f?{type:'video',url:f.link,poster:v.image||'',sourceUrl:v.url||'',creator:v.user?.name||'Pexels creator',provider:'Pexels'}:null}).filter(Boolean).slice(0,4);if(found.length)return found}
   }
-  const broad=query.split(/\s+/).slice(0,2).join(' '),params=new URLSearchParams({action:'query',generator:'search',gsrsearch:`${broad} filetype:bitmap`,gsrnamespace:'6',gsrlimit:'8',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'900',format:'json',origin:'*'});
-  const r=await fetch(`https://commons.wikimedia.org/w/api.php?${params}`,{headers:{'User-Agent':'ClippingHQ/1.0'}});if(!r.ok)return[];const d=await r.json();
-  return Object.values(d?.query?.pages||{}).map(p=>{const info=p.imageinfo?.[0]||{},meta=info.extmetadata||{},url=info.thumburl||info.url;return url?{type:'image',url,poster:url,sourceUrl:info.descriptionurl||'',creator:String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]+>/g,'').slice(0,90),provider:'Wikimedia Commons'}:null}).filter(Boolean).slice(0,4);
+  const words=query.split(/\s+/).filter(Boolean),searches=[query,words.slice(0,2).join(' '),...words.slice(0,3)];
+  for(const search of [...new Set(searches.filter(Boolean))]){
+    const params=new URLSearchParams({action:'query',generator:'search',gsrsearch:`${search} filetype:bitmap`,gsrnamespace:'6',gsrlimit:'8',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'900',format:'json',origin:'*'});
+    const r=await fetch(`https://commons.wikimedia.org/w/api.php?${params}`,{headers:{'User-Agent':'ClippingHQ/1.0'}});if(!r.ok)continue;const d=await r.json();
+    const assets=Object.values(d?.query?.pages||{}).map(p=>{const info=p.imageinfo?.[0]||{},meta=info.extmetadata||{},url=info.thumburl||info.url;return url?{type:'image',url,poster:url,sourceUrl:info.descriptionurl||'',creator:String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]+>/g,'').slice(0,90),provider:'Wikimedia Commons'}:null}).filter(Boolean).slice(0,4);
+    if(assets.length)return assets;
+  }
+  return[];
 }
 export default async function handler(req,res){
   if(req.method!=='POST')return res.status(405).json({error:'POST only'});
