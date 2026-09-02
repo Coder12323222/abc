@@ -80,8 +80,11 @@ $('#startPublish').onclick=async()=>{
     const ud=await up.json().catch(()=>({}));
     if(!up.ok)throw new Error(ud?.error?.message||`YouTube upload failed (${up.status})`);
     const id=ud?.id;
-    progress.innerHTML=id?`Uploaded successfully ✓<br><span>Video ID: ${escapeHtml(id)} • Privacy: Private</span>`:'Uploaded successfully ✓';
-    toast('YouTube upload complete ✓');
+    const privacy=String(ud?.status?.privacyStatus||d.privacyStatus||'public').toLowerCase();
+    const isPublic=privacy==='public';
+    progress.innerHTML=id?`Uploaded successfully ✓<br><span>Video ID: ${escapeHtml(id)} • Privacy: ${isPublic?'Public':escapeHtml(privacy)}</span>`:'Uploaded successfully ✓';
+    if(!isPublic)progress.innerHTML+='<br><span>YouTube kept this upload Private. The Google API project must pass YouTube\'s compliance audit before API uploads can be public.</span>';
+    toast(isPublic?'YouTube public upload complete ✓':'Uploaded, but YouTube kept it Private');
     if(publishIndex>=0){queue[publishIndex].youtubeVideoId=id||null;localStorage.setItem('clipQueue',JSON.stringify(queue));renderQueue()}
   }catch(e){progress.textContent='Upload failed: '+(e.message||'Unknown error.');$('#startPublish').disabled=false}
 };
