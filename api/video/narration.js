@@ -24,6 +24,12 @@ async function visualAssets(query){
   }
   const words=query.split(/\s+/).filter(Boolean),searches=[query,words.slice(0,2).join(' '),...words.slice(0,3)];
   for(const search of [...new Set(searches.filter(Boolean))]){
+    const params=new URLSearchParams({action:'query',generator:'search',gsrsearch:`${search} filetype:video`,gsrnamespace:'6',gsrlimit:'6',prop:'videoinfo',viprop:'url|derivatives|extmetadata',format:'json',origin:'*'});
+    const r=await fetch(`https://commons.wikimedia.org/w/api.php?${params}`,{headers:{'User-Agent':'ClippingHQ/1.0'}});if(!r.ok)continue;const d=await r.json();
+    const assets=Object.values(d?.query?.pages||{}).map(p=>{const title=String(p.title||'').toLowerCase();if(!words.some(w=>w.length>3&&title.includes(w)))return null;const info=p.videoinfo?.[0]||{},meta=info.extmetadata||{},files=(info.derivatives||[]).filter(f=>f.src&&(/^video\/(webm|mp4)/).test(f.type||'')).sort((a,b)=>Math.abs((a.height||720)-720)-Math.abs((b.height||720)-720)),url=files[0]?.src||info.url;return url?{type:'video',url,poster:'',sourceUrl:info.descriptionurl||'',creator:String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]+>/g,'').slice(0,90),provider:'Wikimedia Commons'}:null}).filter(Boolean).slice(0,4);
+    if(assets.length)return assets;
+  }
+  for(const search of [...new Set(searches.filter(Boolean))]){
     const params=new URLSearchParams({action:'query',generator:'search',gsrsearch:`${search} filetype:bitmap`,gsrnamespace:'6',gsrlimit:'8',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'900',format:'json',origin:'*'});
     const r=await fetch(`https://commons.wikimedia.org/w/api.php?${params}`,{headers:{'User-Agent':'ClippingHQ/1.0'}});if(!r.ok)continue;const d=await r.json();
     const assets=Object.values(d?.query?.pages||{}).map(p=>{const info=p.imageinfo?.[0]||{},meta=info.extmetadata||{},url=info.thumburl||info.url;return url?{type:'image',url,poster:url,sourceUrl:info.descriptionurl||'',creator:String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]+>/g,'').slice(0,90),provider:'Wikimedia Commons'}:null}).filter(Boolean).slice(0,4);
