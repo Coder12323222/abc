@@ -61,7 +61,7 @@ async function make(i){
   }catch(e){p.textContent='Video maker error: '+(e.message||'Unknown error')}
 }
 window.makeVideo=make;
-async function youtube(file,item){const title=(section(item.pack,'TITLE')||item.title||'Clipping HQ Short').slice(0,100),description=(section(item.pack,'CAPTION')||section(item.pack,'SHORT SCRIPT')||item.hook||'').slice(0,5000),r=await apiFetch('/api/youtube/upload-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,description,contentType:file.type,contentLength:file.size})}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||`YouTube session failed (${r.status})`);const up=await fetch(d.uploadUrl,{method:'PUT',headers:{Authorization:`Bearer ${d.accessToken}`,'Content-Type':file.type},body:file}),ud=await up.json().catch(()=>({}));if(!up.ok)throw Error(ud?.error?.message||`YouTube upload failed (${up.status})`);return ud.id}
+async function youtube(file,item){const title=(section(item.pack,'TITLE')||item.title||'Clipping HQ Short').slice(0,100),description=(section(item.pack,'CAPTION')||section(item.pack,'SHORT SCRIPT')||item.hook||'').slice(0,5000),r=await apiFetch('/api/youtube/upload-session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,description,contentType:file.type,contentLength:file.size})}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||`YouTube session failed (${r.status})`);const up=await fetch(d.uploadUrl,{method:'PUT',headers:{Authorization:`Bearer ${d.accessToken}`,'Content-Type':file.type},body:file}),ud=await up.json().catch(()=>({}));if(!up.ok)throw Error(ud?.error?.message||`YouTube upload failed (${up.status})`);return {id:ud.id,privacy:String(ud?.status?.privacyStatus||d.privacyStatus||'public').toLowerCase()}}
 async function tiktok(file,item){
   const panel=$('#tiktokDirectPost'),directPost=panel.dataset.mode==='direct';
   const payload={contentType:file.type,contentLength:file.size,directPost};
@@ -93,12 +93,13 @@ async function post(i){
     p.scrollIntoView({behavior:'smooth',block:'center'});both.disabled=false;return;
   }
   p.textContent='Sending the same video to both platforms…';p.scrollIntoView({behavior:'smooth',block:'center'});
-  const [yt,tt]=await Promise.allSettled([youtube(file,item),tiktok(file,item)]),yo=yt.status==='fulfilled',to=tt.status==='fulfilled',ttMode=to?tt.value.mode:'failed';
-  if(yo)item.youtubeVideoId=yt.value;if(to){item.tiktokPublishId=tt.value.publishId;item.tiktokMode=ttMode}localStorage.setItem('clipQueue',JSON.stringify(queue));
+  const [yt,tt]=await Promise.allSettled([youtube(file,item),tiktok(file,item)]),yo=yt.status==='fulfilled',to=tt.status==='fulfilled',ttMode=to?tt.value.mode:'failed',ytPrivacy=yo?yt.value.privacy:'failed',ytPublic=ytPrivacy==='public';
+  if(yo)item.youtubeVideoId=yt.value.id;if(to){item.tiktokPublishId=tt.value.publishId;item.tiktokMode=ttMode}localStorage.setItem('clipQueue',JSON.stringify(queue));
   const ttSuccess=ttMode==='direct'?'TikTok: Direct Post accepted ✓':'TikTok: draft transferred ✓';
-  const successNote=ttMode==='direct'?'YouTube received the video and TikTok is processing the automatic post.':'Both received the exact same video. Open TikTok notifications to finish its draft.';
-  p.innerHTML=`${escapeHtml(yo?'YouTube: uploaded Private ✓':`YouTube: ${yt.reason?.message||'failed'}`)}<br>${escapeHtml(to?ttSuccess:`TikTok: ${tt.reason?.message||'failed'}`)}<br><span>${yo&&to?successNote:'The successful platform was preserved; the exact remaining error is above.'}</span>`;
-  p.scrollIntoView({behavior:'smooth',block:'center'});both.disabled=false;toast(yo&&to?'Sent to both ✓':yo?'YouTube uploaded; TikTok needs attention':to?'TikTok received it; YouTube needs attention':'Both uploads failed');
+  const ytSuccess=ytPublic?'YouTube: uploaded Public ✓':`YouTube: uploaded ${ytPrivacy}; Google API audit required`;
+  const successNote=!ytPublic?'YouTube kept the upload non-public. Complete the Google API compliance audit to remove that provider restriction.':ttMode==='direct'?'YouTube is Public and TikTok is processing the automatic post.':'Both received the exact same video. Open TikTok notifications to finish its draft.';
+  p.innerHTML=`${escapeHtml(yo?ytSuccess:`YouTube: ${yt.reason?.message||'failed'}`)}<br>${escapeHtml(to?ttSuccess:`TikTok: ${tt.reason?.message||'failed'}`)}<br><span>${yo&&to?successNote:'The successful platform was preserved; the exact remaining error is above.'}</span>`;
+  p.scrollIntoView({behavior:'smooth',block:'center'});both.disabled=false;toast(yo&&to&&ytPublic?'Sent to both ✓':yo&&!ytPublic?'YouTube stayed non-public; Google audit required':yo?'YouTube uploaded; TikTok needs attention':to?'TikTok received it; YouTube needs attention':'Both uploads failed');
 }
 window.postBoth=post;$('#videoMakerBoth').onclick=()=>active>=0&&post(active);buttons();
 })();
