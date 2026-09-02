@@ -1,1 +1,2 @@
 Trigger production deployment for Clipping HQ after switching Vercel Production branch to clipping-hq-site.
+Animated video engine release: 2026-09-02.
