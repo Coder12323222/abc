@@ -1,0 +1,92 @@
+.publish-form select {
+  width: 100%;
+  border: 1px solid #30384d;
+  background: #151a28;
+  color: #f7f8fb;
+  border-radius: 10px;
+  padding: 12px;
+  font: inherit;
+  outline: none;
+}
+
+.publish-form select:focus {
+  border-color: #7657c7;
+  box-shadow: 0 0 0 3px #7657c722;
+}
+
+.direct-post-panel {
+  border: 1px solid #3b3160;
+  background: linear-gradient(135deg, #17132a, #111828);
+  border-radius: 14px;
+  padding: 15px;
+  display: grid;
+  gap: 14px;
+}
+
+.direct-post-panel[hidden],
+.direct-post-panel [hidden] {
+  display: none;
+}
+
+.direct-post-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.direct-post-head strong {
+  font-size: 13px;
+  color: #e7ddff;
+}
+
+.direct-post-head span {
+  font-size: 10px;
+  color: #aeb7cb;
+  text-align: right;
+}
+
+.direct-post-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.direct-post-options label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px;
+  border: 1px solid #30384d;
+  border-radius: 9px;
+  background: #111522;
+}
+
+.direct-post-options input,
+.direct-consent input {
+  width: auto !important;
+  margin: 0;
+  accent-color: #8b5cf6;
+}
+
+.direct-consent {
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 10px !important;
+  padding: 12px;
+  border: 1px solid #6049a0;
+  border-radius: 10px;
+  background: #251c3b;
+  color: #f2edff !important;
+}
+
+.direct-consent span {
+  line-height: 1.45;
+}
+
+@media (max-width: 580px) {
+  .direct-post-options { grid-template-columns: 1fr; }
+  .direct-post-head { align-items: flex-start; flex-direction: column; }
+  .direct-post-head span { text-align: left; }
+}

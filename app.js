@@ -126,12 +126,15 @@ async function loadTikTokStatus(){
     const d=await r.json().catch(()=>({}));
     const buttons=$$('.connect[data-platform="TikTok"]');
     const cards=$$('.platform.tt .status');
-    if(d.connected&&d.uploadAuthorized){
-      buttons.forEach(b=>{b.textContent=`✓ ${d.displayName||'TikTok'} • upload ready`;b.classList.add('connected')});
-      cards.forEach(s=>{s.textContent='Upload ready';s.classList.remove('setup');s.classList.add('good')});
+    if(d.connected&&d.directPostAuthorized){
+      buttons.forEach(b=>{b.textContent=`✓ ${d.displayName||'TikTok'} • Direct Post ready`;b.classList.add('connected')});
+      cards.forEach(s=>{s.textContent='Direct Post ready';s.classList.remove('setup');s.classList.add('good')});
+    } else if(d.connected&&d.uploadAuthorized){
+      buttons.forEach(b=>{b.textContent='Reconnect TikTok for Direct Post';b.classList.remove('connected')});
+      cards.forEach(s=>{s.textContent='Draft only';s.classList.add('setup');s.classList.remove('good')});
     } else if(d.connected){
-      buttons.forEach(b=>{b.textContent='Reconnect TikTok for uploads';b.classList.remove('connected')});
-      cards.forEach(s=>{s.textContent='Needs video.upload';s.classList.add('setup');s.classList.remove('good')});
+      buttons.forEach(b=>{b.textContent='Reconnect TikTok for posting';b.classList.remove('connected')});
+      cards.forEach(s=>{s.textContent='Needs posting access';s.classList.add('setup');s.classList.remove('good')});
     } else if(d.configured===false){
       buttons.forEach(b=>b.textContent='Finish TikTok setup');
     }

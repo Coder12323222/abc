@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/direct-post.css" />
 </head>
 <body>
   <div class="noise"></div>
@@ -39,7 +40,7 @@
 
         <div class="grid platforms">
           <article class="platform yt"><div class="platform-top"><span class="platform-icon">▶</span><div><h3>YouTube</h3><p>Shorts + upload</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="YouTube">Connect YouTube</button></article>
-          <article class="platform tt"><div class="platform-top"><span class="platform-icon">♪</span><div><h3>TikTok</h3><p>Connected • draft uploader</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="TikTok">Connect TikTok</button></article>
+          <article class="platform tt"><div class="platform-top"><span class="platform-icon">♪</span><div><h3>TikTok</h3><p>Direct Post + draft fallback</p></div><span class="status setup">Setup</span></div><button class="connect" data-platform="TikTok">Connect TikTok</button></article>
           <article class="platform ig"><div class="platform-top"><span class="platform-icon">◎</span><div><h3>Instagram</h3><p>Optional later</p></div><span class="status setup">Later</span></div><button class="connect" data-platform="Instagram">Instagram later</button></article>
         </div>
 
@@ -62,7 +63,7 @@
         <div class="section-head"><div><p class="eyebrow">SOCIAL ACCOUNTS</p><h2>Connect once</h2><p class="sub">Official OAuth connections live here. Never paste your social passwords into this site.</p></div></div>
         <div class="setup-list">
           <div><b>1</b><span><strong>YouTube OAuth</strong><small>Connected for channel access and uploads.</small></span><button class="connect" data-platform="YouTube">Connect</button></div>
-          <div><b>2</b><span><strong>TikTok Login Kit</strong><small>Connected. Draft uploads use TikTok Content Posting API.</small></span><button class="connect" data-platform="TikTok">Connect</button></div>
+          <div><b>2</b><span><strong>TikTok Login Kit</strong><small>Direct Post uses video.publish; draft fallback uses video.upload.</small></span><button class="connect" data-platform="TikTok">Connect</button></div>
           <div><b>3</b><span><strong>Instagram</strong><small>Optional later; YouTube and TikTok are the current focus.</small></span><button class="connect" data-platform="Instagram">Later</button></div>
         </div>
       </section>
@@ -73,10 +74,10 @@
           <label><input type="checkbox" disabled /> YouTube status is verified live on the Accounts screen</label>
           <label><input type="checkbox" disabled /> TikTok status is verified live on the Accounts screen</label>
           <label><input type="checkbox" disabled /> AI status is verified live in the header</label>
-          <label><input type="checkbox" /> TikTok Content Posting API + video.upload</label>
+          <label><input type="checkbox" /> TikTok Content Posting API + video.publish + video.upload</label>
           <label><input type="checkbox" /> Google public-upload API audit/approval</label>
         </div>
-        <div class="notice"><b>Important:</b> YouTube API uploads stay Private while the Google project is unverified. TikTok draft uploads require TikTok Content Posting API approval and the <code>video.upload</code> scope; those provider approvals cannot be bypassed by Clipping HQ.</div>
+        <div class="notice"><b>Important:</b> YouTube API uploads stay Private while the Google project is unverified. TikTok sandbox Direct Posts are restricted to <b>Only me</b>; public automatic posting requires TikTok's Production audit. Those provider reviews cannot be bypassed by Clipping HQ.</div>
       </section>
 
       <footer style="padding:28px 0 12px;text-align:center;color:#9aa3b8;font-size:13px">

@@ -16,6 +16,7 @@ export default async function handler(req,res){
   );
   requested.add('user.info.basic');
   requested.add('video.upload');
+  requested.add('video.publish');
   const scopes=[...requested].join(',');
 
   const q=new URLSearchParams({

@@ -80,12 +80,15 @@
     try{
       const r=await apiFetch('/api/tiktok/status',{cache:'no-store'});
       const d=await r.json().catch(()=>({}));
-      if(d.connected&&d.uploadAuthorized){
-        buttons().forEach(b=>{b.textContent=`✓ ${d.displayName||'TikTok'} • upload ready`;b.classList.add('connected')});
-        statuses().forEach(s=>{s.textContent='Upload ready';s.classList.remove('setup');s.classList.add('good')});
+      if(d.connected&&d.directPostAuthorized){
+        buttons().forEach(b=>{b.textContent=`✓ ${d.displayName||'TikTok'} • Direct Post ready`;b.classList.add('connected')});
+        statuses().forEach(s=>{s.textContent='Direct Post ready';s.classList.remove('setup');s.classList.add('good')});
+      }else if(d.connected&&d.uploadAuthorized){
+        buttons().forEach(b=>{b.textContent='Reset + reconnect for Direct Post';b.classList.remove('connected')});
+        statuses().forEach(s=>{s.textContent='Draft only';s.classList.add('setup');s.classList.remove('good')});
       }else if(d.connected){
         buttons().forEach(b=>{b.textContent='Reset + reconnect TikTok';b.classList.remove('connected')});
-        statuses().forEach(s=>{s.textContent='Needs upload access';s.classList.add('setup');s.classList.remove('good')});
+        statuses().forEach(s=>{s.textContent='Needs posting access';s.classList.add('setup');s.classList.remove('good')});
       }else if(d.configured===false){
         buttons().forEach(b=>{b.textContent='Finish TikTok setup';b.classList.remove('connected')});
         statuses().forEach(s=>{s.textContent='Setup';s.classList.add('setup');s.classList.remove('good')});
