@@ -36,6 +36,12 @@ $('#refreshScout').onclick=loadScout;$('#refreshScout2').onclick=loadScout;
 function section(pack,label){
   if(!pack)return '';
   const names=['HOOK','NARRATION ANGLE','SHORT SCRIPT','EDIT PLAN','TITLE','CAPTION','RISK NOTE'];
+  let normalized=String(pack).replace(/^\s{0,3}#{1,6}\s*/gm,'').replace(/\*\*|__/g,'');
+  for(const name of names){
+    const heading=name.replaceAll(' ','\\s+');
+    normalized=normalized.replace(new RegExp('^\\s*'+heading+'\\s*:?\\s*','gim'),'\n'+name+'\n');
+  }
+  pack=normalized;
   const escaped=label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   const others=names.filter(n=>n!==label).map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
   const m=pack.match(new RegExp(`(?:^|\\n)${escaped}\\s*\\n([\\s\\S]*?)(?=\\n(?:${others})\\s*\\n|$)`,'i'));
