@@ -103,17 +103,36 @@ async function loadYouTubeStatus(){
     const d=await r.json().catch(()=>({}));
     const buttons=$$('.connect[data-platform="YouTube"]');
     const cards=$$('.platform.yt .status');
+    const disconnect=$('#disconnectYouTube');
     if(d.connected&&d.uploadAuthorized){
       buttons.forEach(b=>{b.textContent=`✓ ${d.channelTitle||'YouTube'} • upload ready`;b.classList.add('connected')});
       cards.forEach(s=>{s.textContent='Upload ready';s.classList.remove('setup');s.classList.add('good')});
+      if(disconnect)disconnect.style.display='inline-block';
     } else if(d.connected){
       buttons.forEach(b=>{b.textContent='Reconnect YouTube for uploads';b.classList.remove('connected')});
       cards.forEach(s=>{s.textContent='Needs upload access';s.classList.add('setup');s.classList.remove('good')});
+      if(disconnect)disconnect.style.display='inline-block';
     } else if(d.configured===false){
       buttons.forEach(b=>b.textContent='Finish YouTube setup');
+      if(disconnect)disconnect.style.display='none';
+    } else if(disconnect){
+      disconnect.style.display='none';
     }
   }catch{}
 }
+
+$('#disconnectYouTube').onclick=async()=>{
+  const button=$('#disconnectYouTube');
+  button.disabled=true;
+  try{
+    const r=await apiFetch('/api/youtube/status',{method:'DELETE'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(d.error||'Could not disconnect YouTube.');
+    button.style.display='none';
+    toast(d.revoked?'YouTube access revoked and disconnected ✓':'YouTube disconnected ✓');
+    await loadYouTubeStatus();
+  }catch(e){toast(e.message||'Could not disconnect YouTube.');button.disabled=false}
+};
 
 async function connectTikTok(){
   try{

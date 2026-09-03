@@ -1,4 +1,4 @@
-import {authorized,refreshIfNeeded} from '../../lib/youtube.js';
+import {authorized,clearTokenCookie,refreshIfNeeded} from '../../lib/youtube.js';
 
 function hasUploadScope(scope=''){
   const scopes=String(scope).split(/\s+/).filter(Boolean);
@@ -18,8 +18,22 @@ async function resolveScope(token){
 }
 
 export default async function handler(req,res){
-  if(req.method!=='GET')return res.status(405).json({error:'GET only'});
   if(!authorized(req))return res.status(401).json({error:'Invalid Clipping HQ access key'});
+  if(req.method==='DELETE'){
+    const token=await refreshIfNeeded(req,res);
+    const value=token?.refresh_token||token?.access_token||'';
+    let revoked=false;
+    if(value){
+      try{
+        const body=new URLSearchParams({token:value});
+        const r=await fetch('https://oauth2.googleapis.com/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+        revoked=r.ok;
+      }catch{}
+    }
+    clearTokenCookie(res);
+    return res.status(200).json({disconnected:true,revoked});
+  }
+  if(req.method!=='GET')return res.status(405).json({error:'GET or DELETE only'});
   const configured=Boolean(process.env.GOOGLE_CLIENT_ID&&process.env.GOOGLE_CLIENT_SECRET);
   if(!configured)return res.status(200).json({configured:false,connected:false,uploadAuthorized:false});
   const token=await refreshIfNeeded(req,res);
